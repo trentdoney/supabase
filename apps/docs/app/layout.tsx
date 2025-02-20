@@ -46,7 +46,7 @@ const viewport: Viewport = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
-      <body>
+      <body className="h-screen w-screen overflow-hidden">
         <GlobalProviders>
           <TopNavSkeleton>{children}</TopNavSkeleton>
         </GlobalProviders>

@@ -484,6 +484,9 @@ importers:
       concurrently:
         specifier: ^9.1.2
         version: 9.1.2
+      derive-valtio:
+        specifier: ^0.2.0
+        version: 0.2.0(valtio@1.12.0(@types/react@18.3.3)(react@18.2.0))
       dotenv:
         specifier: ^16.0.3
         version: 16.3.1
@@ -7274,6 +7277,11 @@ packages:
     resolution: {integrity: sha512-OCg2UsLbXK7GmmpzMXhYkdO64vhJ1ROUUGaTFyHjVwEdMEcTTRj7W1TxLbSBxdY8QLBPCcp66MTyaSy0RpO17A==}
     peerDependencies:
       valtio: '*'
+
+  derive-valtio@0.2.0:
+    resolution: {integrity: sha512-6slhaFHtfaL3t5dLYaQt6s4G2xZymhu0Ktdl7OMeVk8+46RgR8ft6FL0Tr4F31W+yPH03nJe1SSP4JFy2hSMRA==}
+    peerDependencies:
+      valtio: '>=2.0.0-rc.0'
 
   detect-libc@2.0.3:
     resolution: {integrity: sha512-bwy0MGW55bG41VqxxypOsdSdGqLwXPI/focwgTYCFMbdUiBAxLg9CFzG08sz2aqzknwiX7Hkl0bQENjg8iLByw==}
@@ -18958,6 +18966,16 @@ snapshots:
       postcss: 8.4.38
       postcss-value-parser: 4.2.0
 
+  autoprefixer@10.4.16(postcss@8.5.1):
+    dependencies:
+      browserslist: 4.23.3
+      caniuse-lite: 1.0.30001651
+      fraction.js: 4.3.6
+      normalize-range: 0.1.2
+      picocolors: 1.0.1
+      postcss: 8.5.1
+      postcss-value-parser: 4.2.0
+
   available-typed-arrays@1.0.7:
     dependencies:
       possible-typed-array-names: 1.0.0
@@ -19888,6 +19906,10 @@ snapshots:
   dequal@2.0.3: {}
 
   derive-valtio@0.1.0(valtio@1.12.0(@types/react@18.3.3)(react@18.2.0)):
+    dependencies:
+      valtio: 1.12.0(@types/react@18.3.3)(react@18.2.0)
+
+  derive-valtio@0.2.0(valtio@1.12.0(@types/react@18.3.3)(react@18.2.0)):
     dependencies:
       valtio: 1.12.0(@types/react@18.3.3)(react@18.2.0)
 

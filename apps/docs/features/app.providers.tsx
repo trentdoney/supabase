@@ -3,7 +3,6 @@ import { type PropsWithChildren } from 'react'
 import { FeatureFlagProvider, IS_PLATFORM, ThemeProvider } from 'common'
 import { SonnerToaster, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL } from '~/lib/constants'
 import { AuthContainer } from './auth/auth.client'
 import { DocsCommandMenu } from './command'
@@ -25,13 +24,9 @@ function GlobalProviders({ children }: PropsWithChildren) {
           <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
             <TooltipProvider delayDuration={0}>
               <CommandProvider>
-                <div className="flex flex-col">
-                  <SiteLayout>
-                    {children}
-                    <DocsCommandMenu />
-                  </SiteLayout>
-                  <ThemeSandbox />
-                </div>
+                {children}
+                <DocsCommandMenu />
+                <ThemeSandbox />
               </CommandProvider>
               <SonnerToaster position="top-right" />
             </TooltipProvider>

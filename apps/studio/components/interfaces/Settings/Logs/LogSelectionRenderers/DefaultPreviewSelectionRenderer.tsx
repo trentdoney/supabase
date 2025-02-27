@@ -12,7 +12,7 @@ import {
 import type { PreviewLogData, LogSearchCallback } from '../Logs.types'
 import { toast } from 'sonner'
 import { TimestampInfo } from 'ui-patterns'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, MouseEventHandler } from 'react'
 import { ResponseCodeFormatter } from '../LogsFormatters'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 
@@ -39,6 +39,7 @@ const PropertyRow = ({
   const isMethod = keyName === 'method'
   const isPath = keyName === 'path'
   const isUserAgent = keyName === 'user_agent'
+  const isError = keyName === 'error'
 
   const storageKey = `log-viewer-expanded-${keyName}`
   const [isExpanded, setIsExpanded] = useState(() => {
@@ -65,6 +66,17 @@ const PropertyRow = ({
       setIsCopied(false)
     }, 1000)
   }
+
+  const handleTroubleshootClick = useCallback<MouseEventHandler>(
+    (_evt) => {
+      const parsedErrorCode = value.split(':')[0]
+      window.open(
+        `http://localhost:3001/docs/guides/troubleshooting?errorCodes=${parsedErrorCode}`,
+        '_blank'
+      )
+    },
+    [value]
+  )
 
   if (isObject) {
     return (
@@ -162,6 +174,9 @@ const PropertyRow = ({
             Search by {keyName}
           </DropdownMenuItem>
         )}
+        {isError && (
+          <DropdownMenuItem onClick={handleTroubleshootClick}>Troubleshoot error</DropdownMenuItem>
+        )}
       </DropdownMenuContent>
       <LogRowSeparator />
     </DropdownMenu>
@@ -170,6 +185,8 @@ const PropertyRow = ({
 
 const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
   const { timestamp, event_message, metadata, id, status, ...rest } = log
+
+  const error = metadata?.[0]?.error
 
   return (
     <div data-testid="log-selection" className={`p-2 flex flex-col`}>
@@ -183,6 +200,9 @@ const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
           value={log.timestamp}
         />
       )}
+
+      {error && <PropertyRow key="error" keyName="error" value={error} />}
+
       {Object.entries(rest).map(([key, value]) => {
         return <PropertyRow key={key} keyName={key} value={value} />
       })}

@@ -1,5 +1,6 @@
 import { allErrors } from '~/content/errorCodes'
-import { IErrorArgs } from './errorSchema'
+import { type ErrorCode } from '~/content/errorCodes/types'
+import { type IErrorArgs } from './errorSchema'
 
 let cachedErrorMap = null as Map<string, SbError> | null
 
@@ -7,11 +8,7 @@ function getErrorMap() {
   if (!cachedErrorMap) {
     cachedErrorMap = new Map<string, SbError>()
     allErrors.forEach((error) => {
-      const sbError = new SbError({
-        code: error.code,
-        service: error.service,
-        statusCode: error.httpStatus,
-      })
+      const sbError = new SbError(error)
       cachedErrorMap.set(sbError.id, sbError)
     })
   }
@@ -23,11 +20,13 @@ export class SbError {
   code: string
   service: string
   statusCode?: number
+  message?: string
 
-  constructor(args: IErrorArgs) {
-    this.code = args.code
-    this.service = args.service
-    this.statusCode = args.statusCode
+  constructor(data: ErrorCode) {
+    this.code = data.code
+    this.service = data.service
+    this.statusCode = data.httpStatus
+    this.message = data.message
     this.id = SbError.genId({
       service: this.service,
       code: this.code,

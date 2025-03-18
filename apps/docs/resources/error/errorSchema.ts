@@ -49,6 +49,9 @@ const errorType = new GraphQLObjectType({
       type: GraphQLString,
     },
     service: { type: serviceEnumType },
+    message: {
+      type: GraphQLString,
+    },
   },
 })
 

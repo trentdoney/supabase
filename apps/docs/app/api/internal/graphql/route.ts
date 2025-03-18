@@ -48,7 +48,9 @@ export async function POST(req: Request): Promise<NextResponse> {
   } catch (err: unknown) {
     console.error(err)
     if (err instanceof AppError) {
-      return new NextResponse(err.message, { status: err.statusCode() })
+      return new NextResponse(err.isPrivate() ? 'Internal Server Error' : err.message, {
+        status: err.statusCode(),
+      })
     }
     return new NextResponse('Internal Server Error', { status: 500 })
   }

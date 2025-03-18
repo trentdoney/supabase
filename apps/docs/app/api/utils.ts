@@ -5,6 +5,10 @@ export class AppError extends Error {
     super(message)
   }
 
+  isPrivate() {
+    return true
+  }
+
   statusCode() {
     return 500
   }
@@ -34,6 +38,10 @@ export class UnauthorizedError extends AppError {
     super(message)
   }
 
+  isPrivate() {
+    return false
+  }
+
   statusCode() {
     switch (this._type) {
       case 'missing_header':
@@ -59,6 +67,10 @@ export function authenticateBearer(req: Request, keys: string) {
 export class InvalidRequestError extends AppError {
   constructor(message: string) {
     super(message)
+  }
+
+  isPrivate() {
+    return false
   }
 
   statusCode() {

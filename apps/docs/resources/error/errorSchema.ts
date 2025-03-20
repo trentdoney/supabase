@@ -6,7 +6,7 @@ import {
   GraphQLString,
   type GraphQLObjectTypeConfig,
 } from 'graphql'
-import { createConnectionType, InferArgTypes } from '../common'
+import { createCollectionType, InferArgTypes, paginationArgs } from '../common'
 
 const serviceEnumType = new GraphQLEnumType({
   name: 'Service',
@@ -63,5 +63,5 @@ export const errorSchema = {
 } satisfies GraphQLObjectTypeConfig<unknown, unknown>['fields']
 
 export const errorsSchema = {
-  errors: { type: createConnectionType(errorType) },
+  errors: { args: paginationArgs, type: createCollectionType(errorType) },
 }

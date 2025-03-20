@@ -5,7 +5,7 @@ export const rootSchema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
-      // ...errorsSchema,
+      ...errorsSchema,
       ...errorSchema,
     },
   }),

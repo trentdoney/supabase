@@ -86,7 +86,7 @@ export type InferArgTypes<T extends Record<string, ArgDefinition>> = {
 
 export const PageInfoType = new GraphQLObjectType({
   name: 'PageInfo',
-  description: 'Information about pagination in a connection',
+  description: 'Information about pagination in a collection',
   fields: {
     hasNextPage: {
       type: new GraphQLNonNull(GraphQLBoolean),
@@ -118,7 +118,7 @@ export function createEdgeType(nodeType: GraphQLOutputType, name?: string): Grap
 
   return new GraphQLObjectType({
     name: edgeName,
-    description: `An edge in a connection for ${(nodeType as any).name}`,
+    description: `An edge in a collection for ${(nodeType as any).name}`,
     fields: {
       node: {
         type: new GraphQLNonNull(nodeType),
@@ -133,29 +133,29 @@ export function createEdgeType(nodeType: GraphQLOutputType, name?: string): Grap
 }
 
 /**
- * Creates a Connection type for a specific node type
+ * Creates a Collection type for a specific node type
  * @param nodeType The GraphQL Object type for the node
- * @param name Optional name for the connection (defaults to NodeType + 'Connection')
- * @returns A GraphQL Object Type for the connection
+ * @param name Optional name for the collection (defaults to NodeType + 'Collection')
+ * @returns A GraphQL Object Type for the collection
  */
-export function createConnectionType(
+export function createCollectionType(
   nodeType: GraphQLOutputType,
   name?: string
 ): GraphQLObjectType {
-  const connectionName = name || `${(nodeType as any).name}Connection`
+  const collectionName = name || `${(nodeType as any).name}Collection`
   const edgeType = createEdgeType(nodeType)
 
   return new GraphQLObjectType({
-    name: connectionName,
-    description: `A connection to a list of ${(nodeType as any).name} items`,
+    name: collectionName,
+    description: `A collection of ${(nodeType as any).name} items`,
     fields: {
       edges: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(edgeType))),
-        description: 'A list of edges containing nodes in this connection',
+        description: 'A list of edges containing nodes in this collection',
       },
       nodes: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(nodeType))),
-        description: 'The nodes in this connection, directly accessible',
+        description: 'The nodes in this collection, directly accessible',
       },
       pageInfo: {
         type: new GraphQLNonNull(PageInfoType),
@@ -163,7 +163,7 @@ export function createConnectionType(
       },
       totalCount: {
         type: new GraphQLNonNull(GraphQLInt),
-        description: 'The total count of items available in this connection',
+        description: 'The total count of items available in this collection',
       },
     },
   })
@@ -190,56 +190,116 @@ export const paginationArgs = {
     description: 'Returns elements that come before the specified cursor',
   },
 }
+export type IPaginationArgs = InferArgTypes<typeof paginationArgs>
 
-export class GraphQLEdgeCollection<T> {
-  /** The array of nodes/items in the collection */
-  nodes: T[]
-
-  /** The total count of items available in the collection */
-  totalCount: number
-
-  /** Information about the pagination state */
-  pageInfo: {
-    /** Whether there are more items after the current page */
-    hasNextPage: boolean
-    /** Whether there are more items before the current page */
-    hasPreviousPage: boolean
-    /** Cursor pointing to the start of the current page */
-    startCursor: string | null
-    /** Cursor pointing to the end of the current page */
-    endCursor: string | null
-  }
-
-  constructor(data: {
-    nodes: T[]
-    totalCount: number
-    pageInfo: {
-      hasNextPage: boolean
-      hasPreviousPage: boolean
-      startCursor: string | null
-      endCursor: string | null
+interface CollectionFetch<T, TArgs = any> {
+  fetch: (
+    args?: IPaginationArgs & {
+      additionalArgs?: TArgs
     }
-  }) {
-    this.nodes = data.nodes
-    this.totalCount = data.totalCount
-    this.pageInfo = data.pageInfo
+  ) => Promise<{
+    items: T[]
+    totalCount: number
+    hasNextPage?: boolean
+    hasPreviousPage?: boolean
+  }>
+  args?: IPaginationArgs & {
+    additionalArgs?: TArgs
   }
+  getCursor?: (item: T, idx?: number) => string
+  items?: never
+}
+interface CollectionInMemory<T> {
+  items: T[]
+  args?: IPaginationArgs
+  fetch?: never
+  getCursor?: never
+}
+type CollectionBuildArgs<T, TArgs = any> = (CollectionFetch<T, TArgs> | CollectionInMemory<T>) &
+  IPaginationArgs
 
-  /**
-   * Returns whether the collection is empty
-   */
-  isEmpty(): boolean {
-    return this.nodes.length === 0
-  }
+export class GraphQLCollectionBuilder {
+  static async create<T, TArgs = any>(options: CollectionBuildArgs<T, TArgs>) {
+    const { fetch, args = {}, getCursor, items } = options
 
-  /**
-   * Maps over the nodes in the collection and returns a new collection
-   */
-  map<U>(fn: (item: T, index: number) => U): GraphQLEdgeCollection<U> {
-    return new GraphQLEdgeCollection({
-      nodes: this.nodes.map(fn),
-      totalCount: this.totalCount,
-      pageInfo: this.pageInfo,
+    if (items) {
+      return GraphQLCollectionBuilder.paginateArray({ items, ...args })
+    }
+
+    const result = await fetch(args)
+    const { items: fetchedItems, totalCount, hasNextPage = false, hasPreviousPage = false } = result
+    const edges = fetchedItems.map((item) => {
+      return { node: item, cursor: getCursor(item) }
     })
+
+    return {
+      edges,
+      nodes: fetchedItems,
+      totalCount,
+      pageInfo: {
+        hasNextPage,
+        hasPreviousPage,
+        startCursor: edges.length > 0 ? edges[0].cursor : null,
+        endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
+      },
+    }
+  }
+
+  private static paginateArray<T>({
+    items,
+    first,
+    last,
+    after,
+    before,
+  }: CollectionInMemory<T> & IPaginationArgs) {
+    const getCursor = (_item: T, idx: number) => String(idx)
+    const allEdges = items.map((item, idx) => {
+      return { node: item, cursor: getCursor(item, idx) }
+    })
+
+    let hasNextPage = false
+    let hasPreviousPage = false
+
+    let beforeIndex = allEdges.length
+    let afterIndex = -1
+    if (before) {
+      const requestedBefore = Number(before)
+      if (requestedBefore >= 0 && requestedBefore < beforeIndex) {
+        beforeIndex = requestedBefore
+        hasNextPage = true
+      }
+    }
+    if (after) {
+      const requestedAfter = Number(after)
+      if (requestedAfter >= 0) {
+        afterIndex = requestedAfter
+        hasPreviousPage = true
+      }
+    }
+    let edges = allEdges.slice(afterIndex + 1, beforeIndex)
+
+    if (first >= 0) {
+      if (edges.length > first) {
+        edges = edges.slice(0, first)
+        hasNextPage = true
+      }
+    } else if (last >= 0) {
+      if (edges.length > last) {
+        edges = edges.slice(edges.length - last)
+        hasPreviousPage = true
+      }
+    }
+
+    return {
+      edges,
+      nodes: edges.map((edge) => edge.node),
+      totalCount: allEdges.length,
+      pageInfo: {
+        hasNextPage,
+        hasPreviousPage,
+        startCursor: edges.length > 0 ? edges[0].cursor : null,
+        endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
+      },
+    }
   }
 }

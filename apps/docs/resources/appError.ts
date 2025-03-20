@@ -25,4 +25,16 @@ export class Result<T> {
   static err<T>(err: ResourceError): Result<T> {
     return new Result({ data: null, err })
   }
+
+  static async tryCatch<A extends [], R>(
+    fn: (...args: A) => Promise<R>,
+    ...args: A
+  ): Promise<Result<R>> {
+    try {
+      const data = await fn(...args)
+      return Result.ok(data)
+    } catch (err) {
+      return Result.err(err)
+    }
+  }
 }

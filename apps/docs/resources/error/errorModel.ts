@@ -33,6 +33,10 @@ export class SbError {
     })
   }
 
+  static getAll() {
+    return Array.from(getErrorMap().values())
+  }
+
   static genId({ service, code }: { service: string; code: string }) {
     return `${service}::${code}`
   }

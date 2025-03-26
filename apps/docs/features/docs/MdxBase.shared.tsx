@@ -1,11 +1,14 @@
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
+
 import { Button, Image } from 'ui'
 import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
+
+// import { AiPromptsIndex } from '~/app/guides/getting-started/ai-prompts/[slug]/AiPromptsIndex'
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
 import AuthProviders from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
@@ -26,11 +29,11 @@ import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import InfoTooltip from '~/features/ui/InfoTooltip'
 
-const components = {
+export const components = {
   Accordion,
   AccordionItem,
   Admonition,
-  // Admonition: (props: AdmonitionProps) => <Admonition className="[&_a]:underline" {...props} />,
+  // AiPromptsIndex,
   AuthSmsProviderConfig,
   AppleSecretGenerator,
   AuthProviders,
@@ -76,5 +79,3 @@ const components = {
     </Heading>
   ),
 }
-
-export { components }

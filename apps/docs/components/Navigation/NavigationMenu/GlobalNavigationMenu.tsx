@@ -1,8 +1,8 @@
 'use client'
 
-import React, { FC, Fragment, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import React, { FC, Fragment, useEffect, useState } from 'react'
 import {
   Badge,
   cn,
@@ -109,6 +109,7 @@ const GlobalNavigationMenu: FC = () => {
                                 title={item.label}
                                 community={item.community}
                                 icon={item.icon}
+                                badge={item.badge}
                               />
                             </NavigationMenuLink>
                           )
@@ -153,8 +154,9 @@ export const MenuItem = React.forwardRef<
   React.ComponentPropsWithoutRef<'a'> & {
     icon?: string
     community?: boolean
+    badge?: { label: string }
   }
->(({ className, title, href = '', icon, community, children, ...props }, ref) => {
+>(({ className, title, href = '', icon, community, badge, children, ...props }, ref) => {
   return (
     <Link
       href={href}
@@ -170,6 +172,7 @@ export const MenuItem = React.forwardRef<
         <>
           {icon && <MenuIconPicker icon={icon} className="text-foreground-lighter" />}
           <span className="flex-1">{title}</span>
+          {badge && <Badge size="small">{badge.label}</Badge>}
           {community && <Badge size="small">Community</Badge>}
         </>
       )}

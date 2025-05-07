@@ -1,9 +1,9 @@
 import { memo } from 'react'
 
 import type { NavMenuSection } from '../Navigation.types'
+import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
-import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 
 enum MenuId {
   GettingStarted = 'gettingstarted',
@@ -14,6 +14,7 @@ enum MenuId {
   Functions = 'functions',
   Realtime = 'realtime',
   Storage = 'storage',
+  PGReplicate = 'pg_replicate',
   Ai = 'ai',
   Cron = 'cron',
   Queues = 'queues',
@@ -91,6 +92,10 @@ const menus: Menu[] = [
   },
   {
     id: MenuId.Functions,
+    type: 'guide',
+  },
+  {
+    id: MenuId.PGReplicate,
     type: 'guide',
   },
   {
@@ -283,5 +288,5 @@ const NavigationMenu = ({
   return getMenuElement(menu, { additionalNavItems })
 }
 
-export { MenuId, getMenuById }
+export { getMenuById, MenuId }
 export default memo(NavigationMenu)

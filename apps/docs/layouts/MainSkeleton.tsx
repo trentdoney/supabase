@@ -54,6 +54,10 @@ const levelsData = {
     icon: 'edge-functions',
     name: 'Edge Functions',
   },
+  pg_replicate: {
+    icon: 'pg_replicate',
+    name: 'pg_replicate',
+  },
   telemetry: {
     icon: 'telemetry',
     name: 'Telemetry',

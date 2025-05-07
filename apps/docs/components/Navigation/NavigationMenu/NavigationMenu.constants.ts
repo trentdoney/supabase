@@ -48,6 +48,15 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/realtime',
             level: 'realtime',
           },
+          {
+            label: 'pg_replicate',
+            icon: 'pg_replicate',
+            href: '/guides/pg_replicate',
+            level: 'pg_replicate',
+            badge: {
+              label: 'Alpha',
+            },
+          },
         ],
         [
           { label: 'Postgres Modules' },
@@ -2393,6 +2402,18 @@ export const self_hosting: NavMenuConstant = {
           items: [],
         },
       ],
+    },
+  ],
+}
+
+export const pg_replicate: NavMenuConstant = {
+  title: 'pg_replicate',
+  url: '/guides/pg_replicate',
+  icon: 'pg_replicate',
+  items: [
+    {
+      name: 'Overview',
+      url: '/guides/pg_replicate',
     },
   ],
 }

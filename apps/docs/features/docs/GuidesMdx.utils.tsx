@@ -28,7 +28,6 @@ const PUBLISHED_SECTIONS = [
   'integrations',
   'local-development',
   'platform',
-  'pg_replicate',
   'queues',
   'realtime',
   'resources',
@@ -165,4 +164,4 @@ function removeRedundantH1(content: string) {
   return content
 }
 
-export { genGuideMeta, genGuidesStaticParams, getGuidesMarkdown, removeRedundantH1 }
+export { getGuidesMarkdown, genGuidesStaticParams, genGuideMeta, removeRedundantH1 }

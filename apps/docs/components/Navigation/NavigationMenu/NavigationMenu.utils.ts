@@ -1,7 +1,7 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import type { ICommonItem } from '~/components/reference/Reference.types'
 import type { Json } from '~/features/helpers.types'
@@ -129,8 +129,6 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Telemetry
     case pathname.startsWith('platform'):
       return MenuId.Platform
-    case pathname.startsWith('pg_replicate'):
-      return MenuId.PGReplicate
     case pathname.startsWith('queues'):
       return MenuId.Queues
     case pathname.startsWith('realtime'):

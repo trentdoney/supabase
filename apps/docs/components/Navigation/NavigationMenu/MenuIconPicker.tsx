@@ -1,31 +1,32 @@
-import { Clock, Heart, Layers, Server, SquareStack, Telescope } from 'lucide-react'
+import { Clock, Heart, Server, SquareStack, Telescope } from 'lucide-react'
+
 import {
   IconBranching,
   IconGitHub,
-  IconMenuAI,
   IconMenuApi,
   IconMenuAuth,
   IconMenuCli,
   IconMenuCsharp,
   IconMenuDatabase,
-  IconMenuDevCli,
+  IconMenuGraphQL,
   IconMenuEdgeFunctions,
   IconMenuFlutter,
   IconMenuGettingStarted,
-  IconMenuGraphQL,
   IconMenuHome,
   IconMenuIntegrations,
   IconMenuJavascript,
-  IconMenuKotlin,
   IconMenuPlatform,
   IconMenuPython,
   IconMenuRealtime,
   IconMenuResources,
-  IconMenuRestApis,
   IconMenuSelfHosting,
-  IconMenuStatus,
+  IconMenuRestApis,
   IconMenuStorage,
   IconMenuSwift,
+  IconMenuStatus,
+  IconMenuKotlin,
+  IconMenuAI,
+  IconMenuDevCli,
   IconSecurity,
   IconSupport,
   IconTroubleshooting,
@@ -101,8 +102,6 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <Clock width={width} height={height} className={className} />
     case 'queues':
       return <SquareStack width={width} height={height} className={className} />
-    case 'pg_replicate':
-      return <Layers width={width} height={height} className={className} />
     default:
       return <IconMenuPlatform width={width} height={height} className={className} />
   }

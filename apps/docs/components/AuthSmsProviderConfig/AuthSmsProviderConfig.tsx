@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useReducer, useRef } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogSection, Heading } from 'ui'
-import { IconPanel } from 'ui-patterns/IconPanel'
 import { PhoneLoginsItems } from '../Navigation/NavigationMenu/NavigationMenu.constants'
+import { IconPanel } from 'ui-patterns/IconPanel'
+import { Dialog, DialogContent, DialogHeader, DialogSection, Heading } from 'ui'
 import MessageBird from './MessageBirdConfig.mdx'
-import TextLocal from './TextLocalConfig.mdx'
 import Twilio from './TwilioConfig.mdx'
 import Vonage from './VonageConfig.mdx'
+import TextLocal from './TextLocalConfig.mdx'
 
 const reducer = (_, action: (typeof PhoneLoginsItems)[number] | undefined) => {
   const url = new URL(document.location.href)

@@ -20,9 +20,6 @@ type MenuItem = {
   level?: string
   hasLightIcon?: boolean
   community?: boolean
-  badge?: {
-    label: string
-  }
 }
 
 export type DropdownMenuItem = MenuItem & {

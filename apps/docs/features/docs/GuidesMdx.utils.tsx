@@ -54,8 +54,8 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
   let mdx: string
   try {
     mdx = await readFile(fullPath, 'utf-8')
-  } catch {
-    console.error('Error reading Markdown at path: %s', fullPath)
+  } catch (error) {
+    console.error('Error reading Markdown at path %s: %o', fullPath, error)
     notFound()
   }
 
@@ -165,4 +165,4 @@ function removeRedundantH1(content: string) {
   return content
 }
 
-export { getGuidesMarkdown, genGuidesStaticParams, genGuideMeta, removeRedundantH1 }
+export { genGuideMeta, genGuidesStaticParams, getGuidesMarkdown, removeRedundantH1 }

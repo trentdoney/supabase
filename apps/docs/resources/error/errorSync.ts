@@ -1,7 +1,7 @@
 import { type PostgrestError } from '@supabase/supabase-js'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
-import util, { styleText } from 'node:util'
+import util from 'node:util'
 import { parse } from 'smol-toml'
 import { Service } from '../../__generated__/graphql'
 import { extractMessageFromAnyError, MultiError } from '../../app/api/utils'
@@ -9,6 +9,7 @@ import { Result } from '../../features/helpers.fn'
 import { CONTENT_DIRECTORY } from '../../lib/docs'
 import { DatabaseCorrected } from '../../lib/supabase'
 import { supabaseAdmin } from '../../lib/supabaseAdmin'
+import { TaggedLogger } from '../utils/log'
 import { type ErrorCodeDefinition } from './errorTypes'
 
 type ErrorCodeUploadParameters =
@@ -146,41 +147,34 @@ async function deleteUnusedErrorCodes(
  * Syncs error codes from the content files to the database.
  */
 export async function syncErrorCodes(): Promise<Result<any, true>> {
-  const TAG = '[Sync error codes]'
-  const LOG_TAG = styleText('blue', TAG)
-  const ERROR_TAG = styleText('red', TAG)
-  function logWithTag(message: string) {
-    console.log(`${LOG_TAG} ${message}`)
-  }
-  function errorWithTag(message: string) {
-    console.error(`${ERROR_TAG} ${message}`)
-  }
+  const tag = 'Sync error codes'
+  const logger = new TaggedLogger(tag)
 
-  logWithTag('Starting...')
+  logger.log('Starting error code sync...')
 
-  logWithTag('Fetching error codes...')
+  logger.log('Fetching error codes...')
   return (await fetchErrorCodes())
     .mapError((error) => {
-      errorWithTag(`Error syncing error codes: ${error.message}`)
+      logger.error(`Error syncing error codes: ${error.message}`)
       return true as const
     })
     .flatMapAsync(async (errorCodes) => {
-      logWithTag(`Finished fetching ${errorCodes.length} error codes`)
+      logger.log(`Finished fetching ${errorCodes.length} error codes`)
 
-      logWithTag('Uploading error codes...')
+      logger.log('Uploading error codes...')
       const [numberUpserts, uploadError] = await uploadErrorCodes(errorCodes)
-      logWithTag(`Upserted data for ${numberUpserts} error code(s)`)
+      logger.log(`Upserted data for ${numberUpserts} error code(s)`)
       if (uploadError) {
-        errorWithTag(
+        logger.error(
           `${uploadError.totalErrors} error(s) uploading error codes: ${uploadError.message}`
         )
       }
 
-      logWithTag('Deleting unused error codes...')
+      logger.log('Deleting unused error codes...')
       const deleteError = (await deleteUnusedErrorCodes(errorCodes)).match(
-        (numberDeleted) => logWithTag(`Deleted ${numberDeleted} unused error code(s)`),
+        (numberDeleted) => logger.log(`Deleted ${numberDeleted} unused error code(s)`),
         (error) => {
-          errorWithTag(error.message)
+          logger.error(error.message)
           return error
         }
       )

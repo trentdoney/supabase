@@ -1,4 +1,4 @@
-import { extractMessageFromAnyError, MultiError } from '~/app/api/utils'
+import { MultiError } from '~/app/api/utils'
 
 type RecObj<T extends object, K extends keyof T> = T[K] extends Array<T> ? T : never
 
@@ -88,6 +88,12 @@ export class Result<Ok, Error> {
     }
   }
 
+  /**
+   * Transposes an array of results into a result of an array.
+   *
+   * If one or more of the results are errors, the data is dropped and a
+   * MultiError concatenating all the errors is returned.
+   */
   static transposeArray<Ok, Error>(
     array: Array<Result<Ok, Error>>
   ): Result<Array<Ok>, MultiError<Error>> {
@@ -98,15 +104,34 @@ export class Result<Ok, Error> {
       if (result.isOk()) {
         data.push(result.internal.data)
       } else {
-        ;(error ??= new MultiError('MultiError:')).appendError(
-          extractMessageFromAnyError(error),
-          result.internal.error
-        )
+        ;(error ??= new MultiError('MultiError:')).appendError(result.internal.error)
       }
     }
 
     if (error) return Result.error(error)
     return Result.ok(data)
+  }
+
+  /**
+   * Splits an array of results into an array of successes and an optional
+   *
+   * Unlike transposeArray, which only returns either a success (if all the
+   * elements are successful) or an error, splitArray returns both if there
+   * are any errors.
+   */
+  static splitArray<Ok, Error>(array: Array<Result<Ok, Error>>): [Array<Ok>, MultiError] {
+    let data: Array<Ok> = []
+    let error: MultiError | null = null
+
+    for (const result of array) {
+      if (result.isOk()) {
+        data.push(result.internal.data)
+      } else {
+        ;(error ??= new MultiError('MultiError:')).appendError(result.internal.error)
+      }
+    }
+
+    return [data, error]
   }
 
   isOk(): this is Result<Ok, never> {
@@ -141,5 +166,10 @@ export class Result<Ok, Error> {
   ): Mapped | MappedError {
     if (this.isOk()) return onOk(this.internal.data)
     return onError(this.internal.error)
+  }
+
+  unwrapError(): Error {
+    if (this.isOk()) throw new Error('Cannot unwrap error from a successful result')
+    return this.internal.error
   }
 }

@@ -9,6 +9,7 @@ export type Database = {
           created_at: string | null
           deleted_at: string | null
           http_status_code: number | null
+          id: string | null
           message: string | null
           metadata: Json | null
           service: string
@@ -19,6 +20,7 @@ export type Database = {
           created_at?: string | null
           deleted_at?: string | null
           http_status_code?: number | null
+          id?: string | null
           message?: string | null
           metadata?: Json | null
           service: string
@@ -29,6 +31,7 @@ export type Database = {
           created_at?: string | null
           deleted_at?: string | null
           http_status_code?: number | null
+          id?: string | null
           message?: string | null
           metadata?: Json | null
           service?: string
@@ -68,6 +71,36 @@ export type Database = {
         }
         Relationships: []
       }
+      troubleshooting_error_relationship: {
+        Row: {
+          error_id: string
+          troubleshooting_id: string
+        }
+        Insert: {
+          error_id: string
+          troubleshooting_id: string
+        }
+        Update: {
+          error_id?: string
+          troubleshooting_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'troubleshooting_error_relationship_error_id_fkey'
+            columns: ['error_id']
+            isOneToOne: false
+            referencedRelation: 'error'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'troubleshooting_error_relationship_troubleshooting_id_fkey'
+            columns: ['troubleshooting_id']
+            isOneToOne: false
+            referencedRelation: 'troubleshooting_entries'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -78,6 +111,12 @@ export type Database = {
           skip_codes: Json
         }
         Returns: number
+      }
+      sync_troubleshooting_error_relationship: {
+        Args: {
+          error_map: Json
+        }
+        Returns: undefined
       }
       update_error_code: {
         Args: {

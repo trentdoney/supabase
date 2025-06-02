@@ -64,6 +64,16 @@ export class NoDataError<Details extends ObjectOrNever = never> extends ApiError
   }
 }
 
+export class DataAccessError<Details extends ObjectOrNever = never> extends Error {
+  constructor(
+    message: string,
+    source?: unknown,
+    public details?: Details
+  ) {
+    super(message, { cause: source })
+  }
+}
+
 export class MultiError<ErrorType = unknown, Details extends ObjectOrNever = never> extends Error {
   constructor(
     message: string,
@@ -77,9 +87,20 @@ export class MultiError<ErrorType = unknown, Details extends ObjectOrNever = nev
     return (this.cause as Array<ErrorType>)?.length || 0
   }
 
-  appendError(message: string, error: ErrorType): this {
-    this.message = `${this.message}\n\t${message}`
-    ;((this.cause ?? (this.cause = [])) as Array<ErrorType>).push(error)
+  appendError(error: ErrorType): this {
+    const message = extractMessageFromAnyError(error)
+    if (this.message.length < 5000) {
+      this.message = `${this.message}\n${message}`
+    } else if (!this.message.endsWith('...')) {
+      this.message = `${this.message}...`
+    }
+    if (error instanceof MultiError) {
+      ;((this.cause ?? (this.cause = [])) as Array<ErrorType>).push(
+        ...((error.cause as Array<ErrorType>) ?? [])
+      )
+    } else {
+      ;((this.cause ?? (this.cause = [])) as Array<ErrorType>).push(error)
+    }
     return this
   }
 }

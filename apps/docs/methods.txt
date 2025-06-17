@@ -1,0 +1,6 @@
+signUp
+onAuthStateChange
+signInAnonymously
+signInWithPassword
+signInWithIdToken
+signInWithOtp

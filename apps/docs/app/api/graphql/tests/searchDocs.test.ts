@@ -7,6 +7,7 @@ import { POST } from '../route'
 const contentEmbeddingMock = vi.fn().mockImplementation(async () => Result.ok([0.1, 0.2, 0.3]))
 const openAIMock: OpenAIClientInterface = {
   createContentEmbedding: contentEmbeddingMock,
+  createCompletion: vi.fn().mockImplementation(async () => Result.ok('mock response')),
 }
 vi.mock(import('~/lib/openAi'), () => ({
   openAI: () => openAIMock,

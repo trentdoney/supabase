@@ -155,6 +155,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/settings/auth',
+        destination: '/project/:ref/auth/providers',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/settings',
         destination: '/project/:ref/settings/general',
         permanent: true,

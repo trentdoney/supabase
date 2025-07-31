@@ -102,51 +102,6 @@ export const generateSettingsMenu = (
       ],
     },
     {
-      title: 'Configuration',
-      items: [
-        {
-          name: 'Database',
-          key: 'database',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/database/settings`,
-          items: [],
-          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-        },
-        ...(IS_PLATFORM && authEnabled
-          ? [
-              {
-                name: 'Authentication',
-                key: 'auth',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM && storageEnabled
-          ? [
-              {
-                name: 'Storage',
-                key: 'storage',
-                url: `/project/${ref}/storage/settings`,
-                items: [],
-                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM && edgeFunctionsEnabled
-          ? [
-              {
-                name: 'Edge Functions',
-                key: 'functions',
-                url: `/project/${ref}/functions/secrets`,
-                items: [],
-                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-              },
-            ]
-          : []),
-      ],
-    },
-
-    {
       title: 'Billing',
       items: [
         {

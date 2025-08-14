@@ -22,7 +22,7 @@ import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
 /**
  * Get TopNav active label based on current pathname
  */
-export const useActiveMenuLabel = (GLOBAL_MENU_ITEMS) => {
+export const useActiveMenuLabel = (menu: typeof GLOBAL_MENU_ITEMS) => {
   const pathname = usePathname()
   const [activeLabel, setActiveLabel] = useState('')
 
@@ -32,8 +32,11 @@ export const useActiveMenuLabel = (GLOBAL_MENU_ITEMS) => {
       return setActiveLabel('Home')
     }
 
-    for (let index = 0; index < GLOBAL_MENU_ITEMS.length; index++) {
-      const section = GLOBAL_MENU_ITEMS[index]
+    for (let index = 0; index < menu.length; index++) {
+      const section = menu[index]
+      // Skip sections that are hidden
+      if (section[0].showIf === false) continue
+      
       // check if first level menu items match beginning of url
       if (section[0].href?.startsWith(pathname)) {
         return setActiveLabel(section[0].label)
@@ -41,13 +44,15 @@ export const useActiveMenuLabel = (GLOBAL_MENU_ITEMS) => {
       // check if second level menu items match beginning of url
       if (section[0].menuItems) {
         section[0].menuItems.map((menuItemGroup) =>
-          menuItemGroup.map(
-            (menuItem) => menuItem.href?.startsWith(pathname) && setActiveLabel(section[0].label)
-          )
+          menuItemGroup
+            .filter((menuItem) => menuItem.showIf !== false)
+            .map(
+              (menuItem) => menuItem.href?.startsWith(pathname) && setActiveLabel(section[0].label)
+            )
         )
       }
     }
-  }, [pathname])
+  }, [pathname, menu])
 
   return activeLabel
 }
@@ -67,7 +72,7 @@ const GlobalNavigationMenu: FC = () => {
         viewportClassName="mt-0 max-w-screen overflow-hidden border-0 rounded-none mt-1.5 rounded-md !border-x"
       >
         <NavigationMenuList className="px-6 space-x-2 h-[var(--header-height)]">
-          {GLOBAL_MENU_ITEMS.map((section, sectionIdx) =>
+          {GLOBAL_MENU_ITEMS.filter((section) => section[0].showIf !== false).map((section, sectionIdx) =>
             section[0].menuItems ? (
               <NavigationMenuItem
                 key={`desktop-docs-menu-section-${section[0].label}-${sectionIdx}`}
@@ -91,7 +96,7 @@ const GlobalNavigationMenu: FC = () => {
                     {section[0].menuItems?.map((menuItem, menuItemIndex) => (
                       <Fragment key={`desktop-docs-menu-section-${menuItemIndex}-${menuItemIndex}`}>
                         {menuItemIndex !== 0 && <MenubarSeparator className="bg-border-muted" />}
-                        {menuItem.map((item, itemIdx) =>
+                        {menuItem.filter((item) => item.showIf !== false).map((item, itemIdx) =>
                           !item.href ? (
                             <div
                               key={`desktop-docs-menu-section-label-${item.label}-${itemIdx}`}

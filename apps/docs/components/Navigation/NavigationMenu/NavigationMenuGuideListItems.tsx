@@ -94,7 +94,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
 
         {props.subItem.items && props.subItem.items.length > 0 && (
           <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
-            {props.subItem.items.map((subSubItem) => {
+            {props.subItem.items.filter((subSubItem) => subSubItem.showIf !== false).map((subSubItem) => {
               return (
                 <li key={props.subItem.name}>
                   <Link
@@ -153,12 +153,12 @@ const Content = (props) => {
         </div>
       </Link>
 
-      {menu.items.map((x) => {
+      {menu.items.filter((x) => x.showIf !== false).map((x) => {
         return (
           <div key={x.name}>
             {x.items && x.items.length > 0 ? (
               <div className="flex flex-col gap-2.5">
-                {x.items.map((subItem, subItemIndex) => {
+                {x.items.filter((subItem) => subItem.showIf !== false).map((subItem, subItemIndex) => {
                   return (
                     <ContentAccordionLink
                       key={subItem.name}

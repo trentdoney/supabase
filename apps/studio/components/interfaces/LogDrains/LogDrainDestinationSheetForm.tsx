@@ -524,7 +524,9 @@ export function LogDrainDestinationSheetForm({
         </SheetSection>
 
         <div className="mt-auto">
-          <SheetSection className={`border-t bg-background-alternative-200 mt-auto ${!IS_PLATFORM ? 'hidden' : ''}`}>
+          <SheetSection
+            className={`border-t bg-background-alternative-200 mt-auto ${!IS_PLATFORM ? 'hidden' : ''}`}
+          >
             <FormItemLayout
               isReactForm={false}
               layout="horizontal"

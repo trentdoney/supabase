@@ -8,7 +8,7 @@ import { useParams } from 'common'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import {
-  ProjectServiceStatus,
+  ProjectServiceStatus as APIProjectServiceStatus,
   useProjectServiceStatusQuery,
 } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -24,6 +24,8 @@ import {
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
+type ProjectServiceStatus = APIProjectServiceStatus | 'DISABLED'
+
 const StatusMessage = ({
   status,
   isLoading,
@@ -34,6 +36,7 @@ const StatusMessage = ({
   status?: ProjectServiceStatus
 }) => {
   if (isLoading) return 'Checking status'
+  if (status === 'DISABLED') return 'Disabled'
   if (status === 'UNHEALTHY') return 'Unhealthy'
   if (status === 'COMING_UP') return 'Coming up...'
   if (status === 'ACTIVE_HEALTHY') return 'Healthy'
@@ -60,6 +63,7 @@ const StatusIcon = ({
   projectStatus?: ProjectServiceStatus
 }) => {
   if (isLoading) return <LoaderIcon />
+  if (projectStatus === 'DISABLED') return <AlertIcon />
   if (projectStatus === 'UNHEALTHY') return <AlertIcon />
   if (projectStatus === 'COMING_UP') return <LoaderIcon />
   if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
@@ -118,7 +122,18 @@ export const ServiceStatus = () => {
     },
     {
       refetchInterval: (data) =>
-        data?.some((service) => service.status !== 'ACTIVE_HEALTHY') ? 5000 : false,
+        data?.some((service) => {
+          // if the postgrest service has an empty schema, the user chose to turn off postgrest during project creation
+          if (service.name === 'rest' && (service.info as any).db_schema === '') {
+            return false
+          }
+          if (service.status === 'ACTIVE_HEALTHY') {
+            return false
+          }
+          return true
+        })
+          ? 5000
+          : false,
     }
   )
   const { data: edgeFunctionsStatus, refetch: refetchEdgeFunctionServiceStatus } =
@@ -159,7 +174,9 @@ export const ServiceStatus = () => {
       error: restStatus?.error,
       docsUrl: undefined,
       isLoading,
-      status: restStatus?.status ?? 'UNHEALTHY',
+      // If PostgREST has an empty schema, it means it's been disabled
+      status:
+        (restStatus?.info as any).db_schema === '' ? 'DISABLED' : restStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled

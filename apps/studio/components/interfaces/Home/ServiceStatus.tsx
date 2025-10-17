@@ -124,7 +124,7 @@ export const ServiceStatus = () => {
       refetchInterval: (data) =>
         data?.some((service) => {
           // if the postgrest service has an empty schema, the user chose to turn off postgrest during project creation
-          if (service.name === 'rest' && (service.info as any).db_schema === '') {
+          if (service.name === 'rest' && (service.info as any)?.db_schema === '') {
             return false
           }
           if (service.status === 'ACTIVE_HEALTHY') {
@@ -176,7 +176,9 @@ export const ServiceStatus = () => {
       isLoading,
       // If PostgREST has an empty schema, it means it's been disabled
       status:
-        (restStatus?.info as any).db_schema === '' ? 'DISABLED' : restStatus?.status ?? 'UNHEALTHY',
+        (restStatus?.info as any)?.db_schema === ''
+          ? 'DISABLED'
+          : restStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled

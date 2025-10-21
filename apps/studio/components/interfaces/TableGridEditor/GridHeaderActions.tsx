@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams, useFlag } from 'common'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { RefreshButton } from 'components/grid/components/header/RefreshButton'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
@@ -70,6 +71,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const isMaterializedView = isTableLikeMaterializedView(table)
 
   const triggersInsteadOfRealtime = useFlag<boolean>('triggersInsteadOfRealtime')
+  const hideRealtimeButton = usePHFlag<boolean>('hideRealtimeButtonForNewUsers')
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
@@ -367,6 +369,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
               </Link>
             </Button>
           ) : (
+            !hideRealtimeButton &&
             realtimeEnabled && (
               <ButtonTooltip
                 type="default"

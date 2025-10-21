@@ -47,7 +47,7 @@ export const useTrack = () => {
       const event = {
         action,
         ...(properties && { properties }),
-        ...(Object.keys(groups).length > 0 && { groups }),
+        ...(groups && { groups }),
       } as EventMap[A]
 
       sendEvent(event)
